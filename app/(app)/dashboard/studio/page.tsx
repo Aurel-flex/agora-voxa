@@ -266,7 +266,7 @@ export default function StudioPage() {
             {/* 💡 REMPLACEMENT ÉMOJI PAR TA MASCOTTE */}
             <div className="relative w-32 h-32 mx-auto animate-bounce">
               <Image 
-                src="/mascotte-athena-reflexion.png" 
+                src="/mascotte-athena-reflexion.webp" 
                 alt="Mascotte Panthère" 
                 fill 
                 className="object-contain"
@@ -282,7 +282,7 @@ export default function StudioPage() {
             <div className="flex flex-col items-center text-center gap-4">
                {/* 💡 PETITE PANTHÈRE À CÔTÉ DU SCORE */}
               <div className="w-16 h-16 relative">
-                <Image src="/mascotte-athena-applause.png" alt="Panthère" fill className="object-contain" />
+                <Image src="/mascotte-athena-applause.webp" alt="Panthère" fill className="object-contain" />
               </div>
               <div>
                 <h1 className="text-4xl font-baloo font-extrabold text-white">Le retour d'Athéna</h1>

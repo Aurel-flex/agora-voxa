@@ -3,23 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useUser } from "@/context/UserContext";
-import Image from "next/image"; // Import pour gérer l'image proprement
 
 export default function ConnexionPage() {
   const router = useRouter();
   const { login } = useUser();
   
   const [identifier, setIdentifier] = useState(""); 
-  const [password, setPassword] = useState(""); // Ajout du state pour le mot de passe
+  const [password, setPassword] = useState(""); 
   const [error, setError] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(false); // Reset l'erreur à chaque tentative
+    setError(false); 
 
-    // On passe l'identifiant au login. 
-    // Rappel : vérifie que dans UserContext, login accepte bien le pseudo !
     const success = login(identifier); 
     
     if (success) {
@@ -30,73 +28,72 @@ export default function ConnexionPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 animate-fade-in">
-      <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-3xl border border-slate-200 shadow-xl text-center relative overflow-hidden">
-        
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
-        
-    <div className="relative w-32 h-32 mx-auto animate-bounce">
-                <Image 
-                  src="/mascotte-athena-simple.png" 
-                  alt="Mascotte Panthère" 
-                  fill 
-                  className="object-contain"
-                />
-              </div>
-        <h2 className="font-baloo text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 relative z-10">Connexion</h2>
-        <p className="font-soleil text-slate-500 mb-8 relative z-10">Heureux de te revoir dans l'Agora !</p>
-        
-        {error && (
-          <div className="bg-rose-50 text-rose-600 p-4 rounded-2xl mb-6 font-soleil font-bold border border-rose-200 relative z-10 animate-shake">
-            Ce compte n'existe pas. Vérifie tes identifiants ou inscris-toi.
-          </div>
-        )}
+    <div className="relative flex flex-col items-center justify-center min-h-[85vh] px-4 overflow-hidden bg-[#F8F9FA]">
+      
+      {/* Formes d'arrière-plan (Blobs) */}
+      <div className="absolute -bottom-32 -left-20 w-[24rem] h-[24rem] bg-[#7882B4] rounded-full opacity-80"></div>
+      <div className="absolute top-20 -right-20 w-[20rem] h-[20rem] bg-[#B5B2C6] rounded-full opacity-80"></div>
 
-        {/* noValidate empêche le navigateur de forcer le format email */}
-        <form onSubmit={handleLogin} className="space-y-5 relative z-10" noValidate>
+      {/* Conteneur principal (Carte + Mascotte) */}
+      <div className="relative z-10 w-full max-w-md mt-10">
+        
+        {/* Carte du formulaire */}
+        <div className="bg-[#B5B2C6] p-8 md:p-10 rounded-[2rem] shadow-xl text-center relative z-20 border border-white/20">
           
-          <div className="text-left">
-            <label htmlFor="identifier" className="font-baloo font-bold text-slate-700 ml-2 mb-1 block">
-              Email ou Pseudo
-            </label>
+          <h2 className="font-baloo text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 tracking-tight">
+            Connexion
+          </h2>
+          
+          {error && (
+            <div className="bg-rose-100 text-rose-600 p-3 rounded-xl mb-6 text-sm font-bold border border-rose-200 animate-shake">
+              Identifiants introuvables. Vérifie ton pseudo/email.
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4" noValidate>
             <input 
-              id="identifier"
               type="text" 
-              inputMode="text" // Aide les mobiles à ne pas forcer le clavier email
-              placeholder="Ex: ciceron99 ou jean@mail.com" 
+              inputMode="text"
+              placeholder="Ton pseudo/email" 
               required
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              className="w-full p-4 font-soleil bg-slate-50 rounded-2xl border-2 border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-slate-900"
+              className="w-full p-3.5 bg-[#E2E4E9]/80 placeholder-slate-400/80 rounded-xl border-none focus:ring-2 focus:ring-[#55518b] outline-none text-slate-800 transition-all font-soleil text-sm md:text-base"
             />
-          </div>
-
-          <div className="text-left">
-            <label htmlFor="password" className="font-baloo font-bold text-slate-700 ml-2 mb-1 block">
-              Mot de passe
-            </label>
+            
             <input 
-              id="password"
               type="password" 
-              placeholder="••••••••" 
+              placeholder="Ton mot de passe" 
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 font-soleil bg-slate-50 rounded-2xl border-2 border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-slate-900"
+              className="w-full p-3.5 bg-[#E2E4E9]/80 placeholder-slate-400/80 rounded-xl border-none focus:ring-2 focus:ring-[#55518b] outline-none text-slate-800 transition-all font-soleil text-sm md:text-base"
             />
-          </div>
+            
+            <button 
+              type="submit" 
+              className="w-full mt-6 bg-[#55518b] hover:bg-[#433f80] text-white px-8 py-3.5 rounded-xl font-baloo font-bold text-lg transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Se connecter
+            </button>
+          </form>
 
-          <button 
-            type="submit" 
-            className="w-full mt-2 bg-primary hover:bg-[#433f80] text-white px-8 py-4 rounded-2xl font-baloo font-bold text-xl transition-all shadow-lg hover:shadow-primary/20 hover:scale-[1.02] active:scale-95"
-          >
-            Se connecter
-          </button>
-        </form>
-        
-        <p className="mt-8 text-slate-500 font-soleil font-medium relative z-10">
-          Pas encore de compte ? <Link href="/inscription" className="text-secondary hover:text-[#253c7a] font-bold transition-colors">S'inscrire</Link>
-        </p>
+          <p className="mt-6 text-sm text-slate-700 font-medium font-soleil">
+            Pas encore de compte ? <Link href="/inscription" className="text-slate-900 font-bold hover:underline">S'inscrire</Link>
+          </p>
+
+        </div>
+
+        {/* Mascotte (Panthère) positionnée par-dessus */}
+        <div className="absolute -bottom-16 -right-24 z-30 w-56 h-56 pointer-events-none drop-shadow-2xl hidden md:block">
+          <Image 
+            src="/mascotte-athena-applause.webp" // 👈 N'oublie pas de mettre le vrai nom de ton image de panthère ici !
+            alt="Mascotte Panthère"
+            fill
+            className="object-contain"
+          />
+        </div>
+
       </div>
     </div>
   );

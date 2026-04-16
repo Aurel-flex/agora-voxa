@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,10 +28,24 @@ export default function Navigation() {
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
       <nav className="flex items-center justify-between p-4 max-w-7xl mx-auto w-full relative">
         
-        {/* LOGO (En Baloo) */}
-        <Link href={isAppMode ? "/dashboard" : "/"} onClick={closeMenu} className="font-baloo text-2xl font-bold text-primary tracking-wider flex items-center gap-2">
-          {isAppMode && <span className="text-2xl">🦉</span>} 
-          AGORA-VOXA
+{/* LOGO & NOM DE LA MARQUE */}
+        <Link href={isAppMode ? "/dashboard" : "/"} onClick={closeMenu} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+          
+          {/* 1. Le Logo (Taille réduite à 40x40) */}
+          <Image 
+            src="/logo-agoravoxa.webp" 
+            alt="Logo Agora-Voxa" 
+            width={40}  // 👈 J'ai mis 40, tu peux baisser à 30 ou monter à 50 selon ton image !
+            height={40} 
+            className="object-contain"
+            priority 
+          />
+
+          {/* 2. Le Texte à droite */}
+          <span className="font-baloo text-2xl font-bold text-primary tracking-wider mt-1">
+            AGORA-VOXA
+          </span>
+
         </Link>
         
         {/* --- LIENS DESKTOP --- */}

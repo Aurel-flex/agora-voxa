@@ -25,6 +25,7 @@ interface UserContextType {
   level: number;
   league: { name: string; icon: string; color: string };
   isFirstVisit: boolean;
+  isFirstSession: boolean; // 👈 NOUVEAU : Garde le texte "Bienvenue" stable
   completeFirstVisit: () => void;
   updateProfile: (newName: string, newAvatar: string) => void;
 }
@@ -34,13 +35,19 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isFirstSession, setIsFirstSession] = useState(false); // 👈 L'état de la session
   const router = useRouter();
 
   useEffect(() => {
     const sessionEmail = localStorage.getItem("agora_session");
     if (sessionEmail) {
       const userData = localStorage.getItem(`agora_user_${sessionEmail}`);
-      if (userData) setUser(JSON.parse(userData));
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        // Si c'est sa toute première connexion au chargement, on bloque "Bienvenue" pour la session
+        setIsFirstSession(parsedUser.isFirstVisit || false);
+      }
     }
     setIsLoaded(true);
   }, []);
@@ -49,7 +56,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const safeEmail = updatedUser.email.toLowerCase();
     localStorage.setItem(`agora_user_${safeEmail}`, JSON.stringify(updatedUser));
     
-    // On garde une trace de l'email pour pouvoir le retrouver via le pseudo
     const allEmails = JSON.parse(localStorage.getItem("agora_all_emails") || "[]");
     if (!allEmails.includes(safeEmail)) {
       allEmails.push(safeEmail);
@@ -68,19 +74,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
       xp: 0, 
       completedCourses: [], 
       isFirstVisit: true,
-      avatar: "🦉" // Avatar par défaut
+      avatar: "🦉" 
     };
     saveUserToDB(newUser); 
     localStorage.setItem("agora_session", safeEmail); 
+    setIsFirstSession(true); // 👈 Inscription = Première session garantie
   };
 
   const login = (identifier: string) => {
     const cleanId = identifier.trim().toLowerCase();
-    
-    // 1. On récupère tous les emails enregistrés sur cette machine
     const allEmails = JSON.parse(localStorage.getItem("agora_all_emails") || "[]");
 
-    // 2. On scanne chaque compte pour voir si le pseudo ou le mail match
     for (const email of allEmails) {
       const data = localStorage.getItem(`agora_user_${email}`);
       if (data) {
@@ -90,18 +94,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
           potentialUser.name.toLowerCase() === cleanId
         ) {
           setUser(potentialUser);
+          setIsFirstSession(false); // 👈 Connexion existante = Bon retour
           localStorage.setItem("agora_session", potentialUser.email.toLowerCase());
-          return true; // Trouvé !
+          return true; 
         }
       }
     }
-    return false; // Pas trouvé
+    return false; 
   };
 
   const logout = () => {
     setUser(null);
+    setIsFirstSession(false);
     localStorage.removeItem("agora_session");
-    router.push("/connexion"); // Redirige vers ta page de connexion
+    router.push("/connexion"); 
   };
 
   const addXp = (amount: number) => {
@@ -163,6 +169,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       level, 
       league,
       isFirstVisit: user?.isFirstVisit ?? false, 
+      isFirstSession, // 👈 On l'exporte pour le Dashboard
       completeFirstVisit 
     }}>
       {children}

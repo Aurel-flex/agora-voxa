@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Home, Mic, Activity, Trophy, User, LogOut, Map, X, Crown, Globe, Bell } from 'lucide-react'; 
 import { useUser } from '@/context/UserContext'; 
+import InstallPwaBanner from '@/components/InstallPwaBanner';
 
 // 1. LE COMPOSANT ENFANT (Navigation)
 function AppNavigation({ children }: { children: React.ReactNode }) {
@@ -314,11 +315,16 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
   );
 }
 
-// 2. LE COMPOSANT PARENT
+// LE COMPOSANT PARENT (Tout en bas du fichier)
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppNavigation>
-      {children}
-    </AppNavigation>
+    <>
+      <AppNavigation>
+        {children}
+      </AppNavigation>
+      
+      {/* 👇 La bannière est maintenant uniquement dans la zone connectée ! */}
+      <InstallPwaBanner />
+    </>
   );
 }

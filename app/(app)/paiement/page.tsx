@@ -155,7 +155,7 @@ export default function PaiementPage() {
               <button 
                 type="submit"
                 disabled={isProcessing}
-                className="w-full mt-6 bg-[#662483] hover:bg-[#4d1b63] disabled:bg-slate-700 text-white py-4 rounded-xl font-baloo font-bold text-lg transition-all shadow-lg shadow-[#662483]/20 flex items-center justify-center gap-2"
+                className="w-full mt-6 bg-accent hover:bg-[#4d1b63] disabled:bg-slate-700 text-white py-4 rounded-xl font-baloo font-bold text-lg transition-all shadow-lg shadow-[#662483]/20 flex items-center justify-center gap-2"
               >
                 {isProcessing ? (
                   <>

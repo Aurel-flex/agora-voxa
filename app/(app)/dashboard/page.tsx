@@ -7,7 +7,7 @@ import { useUser } from "@/context/UserContext";
 import { Map, Trophy, User, PlayCircle, Crown, Swords, Home } from "lucide-react";
 
 export default function DashboardPage() {
-  const { xp, completedCourses, user, level, league, isFirstVisit, completeFirstVisit } = useUser();
+  const { xp, completedCourses, user, level, league, isFirstVisit,isFirstSession, completeFirstVisit } = useUser();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function DashboardPage() {
              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 blur-3xl rounded-full"></div>
 
              <div className="flex justify-center mb-6 relative w-24 h-24 mx-auto">
-               <Image src="/mascotte-athena-pouce.png" alt="Athéna valide" fill className="object-contain" />
+               <Image src="/mascotte-athena-pouce.webp" alt="Athéna valide" fill className="object-contain" />
              </div>
              
              <h2 className="font-baloo text-3xl font-bold text-center text-white mb-2">Bienvenue dans l'Agora !</h2>
@@ -99,7 +99,7 @@ export default function DashboardPage() {
   {/* L'image de ta Mascotte Athéna */}
   <div className="relative w-32 h-32 md:w-48 md:h-48 shrink-0 z-10 drop-shadow-2xl hover:scale-105 transition-transform duration-300">
     <Image 
-      src="/mascotte-athena-simple.png" 
+      src="/mascotte-athena-simple.webp" 
       alt="Mascotte Athéna"
       fill
       className="object-contain"
@@ -112,9 +112,8 @@ export default function DashboardPage() {
        <span className="font-baloo font-bold text-primary uppercase tracking-wider text-sm">Accueil</span>
     </div>
     
-    <h1 className="font-baloo text-3xl md:text-4xl font-bold text-white mb-2">
-      {/* 🛠️ FIX ICI : On utilise isFirstVisit pour switcher entre Bienvenue et Bon retour */}
-      {isFirstVisit ? "Bienvenue" : "Bon retour"}, <span className="text-primary">{user?.name || "Orateur"}</span> !
+ <h1 className="font-baloo text-3xl md:text-4xl font-bold text-white mb-2">
+      {isFirstSession ? "Bienvenue" : "Bon retour"}, <span className="text-primary">{user?.name || "Orateur"}</span> !
     </h1>
     
     <p className="font-soleil text-slate-400 text-lg mb-6">
@@ -180,7 +179,7 @@ export default function DashboardPage() {
         // Encart Parcours terminé avec Athéna joyeuse
         <div className="bg-emerald-950/30 border border-emerald-500/30 p-8 rounded-3xl text-center shadow-sm flex flex-col items-center">
           <div className="relative w-32 h-32 mb-4">
-            <Image src="/mascotte-athena-youpi.png" alt="Athéna célèbre" fill className="object-contain" />
+            <Image src="/mascotte-athena-youpi.webp" alt="Athéna célèbre" fill className="object-contain" />
           </div>
           <h3 className="font-baloo font-bold text-emerald-400 text-2xl mt-1">Parcours terminé !</h3>
           <p className="font-soleil font-medium text-emerald-200/70 mt-2">Tu as complété tous les modules disponibles.</p>

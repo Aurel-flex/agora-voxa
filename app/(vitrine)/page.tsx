@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
 <Image 
-        src="/mascotte-athena-pouce.png"  // Le nom exact de ton fichier dans 'public'
+        src="/mascotte-athena-pouce.webp"  // Le nom exact de ton fichier dans 'public'
         alt="Mascotte Agora-Voxa"     // Texte alternatif (super important pour le SEO et l'accessibilité)
         width={150}                   // Largeur en pixels
         height={150}                  // Hauteur en pixels
