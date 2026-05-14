@@ -53,7 +53,7 @@ export default function PedagogiePage() {
             <p className="italic text-slate-600 mb-6">"Je me meurs, je suis mort, je suis enterré."</p>
             <div className="space-y-3">
               <div className="p-4 rounded-xl border-2 border-slate-200 text-slate-500">Une anaphore</div>
-              <div className="p-4 rounded-xl border-2 border-[#662483] bg-[#662483]/5 text-[#662483] font-bold flex justify-between">
+              <div className="p-4 rounded-xl border-2 border-accent bg-accent/5 text-accent font-bold flex justify-between">
                 Une gradation <span>✅</span>
               </div>
             </div>
@@ -65,7 +65,7 @@ export default function PedagogiePage() {
         {/* 💡 Bouton mis à jour avec le style unifié de ton UI Kit */}
         <Link 
           href="/inscription" 
-          className="inline-flex items-center justify-center gap-2 bg-[#662483] hover:bg-[#8631ab] text-white px-8 py-4 rounded-xl font-baloo font-bold text-xl transition-all shadow-lg shadow-[#662483]/20 hover:shadow-xl hover:-translate-y-0.5 focus:ring-2 focus:ring-[#662483] focus:ring-offset-2"
+          className="inline-flex items-center justify-center gap-2 bg-accent hover:bg-[#8631ab] text-white px-8 py-4 rounded-xl font-baloo font-bold text-xl transition-all shadow-lg shadow-accent/20 hover:shadow-xl hover:-translate-y-0.5 focus:ring-2 focus:ring-accent focus:ring-offset-2"
         >
           Commencer la formation
         </Link>
