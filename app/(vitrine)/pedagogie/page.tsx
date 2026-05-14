@@ -26,11 +26,16 @@ export default function PedagogiePage() {
               <li className="flex items-center gap-2">✅ Transcriptions incluses</li>
             </ul>
           </div>
-          {/* Fausse vidéo pour illustrer */}
-          <div className="flex-1 w-full bg-slate-800 rounded-3xl aspect-video flex items-center justify-center shadow-xl relative overflow-hidden">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm cursor-pointer hover:scale-110 transition-transform">
-              <div className="w-0 h-0 border-t-8 border-t-transparent border-l-16 border-l-white border-b-8 border-b-transparent ml-1"></div>
-            </div>
+          
+          {/* 💡 LECTEUR CLOUDINARY INTÉGRÉ ICI */}
+          <div className="flex-1 w-full bg-slate-900 rounded-3xl aspect-video shadow-xl relative overflow-hidden border border-slate-200">
+            <iframe
+              src="https://player.cloudinary.com/embed/?cloud_name=dz8g1qhyj&public_id=Agora-Voxa_1_m9l3o9"
+              className="absolute top-0 left-0 w-full h-full"
+              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+              allowFullScreen
+              frameBorder="0"
+            ></iframe>
           </div>
         </div>
 
@@ -48,7 +53,7 @@ export default function PedagogiePage() {
             <p className="italic text-slate-600 mb-6">"Je me meurs, je suis mort, je suis enterré."</p>
             <div className="space-y-3">
               <div className="p-4 rounded-xl border-2 border-slate-200 text-slate-500">Une anaphore</div>
-              <div className="p-4 rounded-xl border-2 border-primary bg-primary/5 text-primary font-bold flex justify-between">
+              <div className="p-4 rounded-xl border-2 border-[#662483] bg-[#662483]/5 text-[#662483] font-bold flex justify-between">
                 Une gradation <span>✅</span>
               </div>
             </div>
@@ -57,7 +62,11 @@ export default function PedagogiePage() {
       </div>
 
       <div className="font-baloo text-center mt-24">
-        <Link href="/inscription" className="bg-primary hover:bg-[#433f80] text-white px-8 py-4 rounded-2xl font-baloo font-bold text-xl transition-all shadow-lg hover:scale-105">
+        {/* 💡 Bouton mis à jour avec le style unifié de ton UI Kit */}
+        <Link 
+          href="/inscription" 
+          className="inline-flex items-center justify-center gap-2 bg-[#662483] hover:bg-[#8631ab] text-white px-8 py-4 rounded-xl font-baloo font-bold text-xl transition-all shadow-lg shadow-[#662483]/20 hover:shadow-xl hover:-translate-y-0.5 focus:ring-2 focus:ring-[#662483] focus:ring-offset-2"
+        >
           Commencer la formation
         </Link>
       </div>
