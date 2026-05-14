@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Home, Mic, Activity, Trophy, User, LogOut, Map, X, Crown, Globe, Bell } from 'lucide-react'; 
 import { useUser } from '@/context/UserContext'; 
 import InstallPwaBanner from '@/components/InstallPwaBanner';
+import Image from "next/image";
 
 // 1. LE COMPOSANT ENFANT (Navigation)
 function AppNavigation({ children }: { children: React.ReactNode }) {
@@ -14,20 +15,26 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
   const { logout, user } = useUser(); 
   
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  // 💡 NOUVEAU : État pour le panneau de notifications
   const [isNotifPanelOpen, setIsNotifPanelOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    // Si l'utilisateur est explicitement null (non connecté), on le renvoie dehors
+    if (user === null) {
       router.push('/connexion');
     }
   }, [user, router]);
 
-  if (!user) return null;
+  // On empêche l'affichage du layout tant qu'on n'est pas sûr qu'il est connecté
+  if (user === null) return null;
 
-  const handleLogout = () => {
-    if (logout) logout();
-    router.push('/'); 
+  // 💡 NOUVEAU : Firebase nécessite une déconnexion asynchrone
+  const handleLogout = async () => {
+    try {
+      await logout(); 
+      // Plus besoin de router.push ici, le UserContext s'en charge !
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion :", error);
+    }
   };
 
   const navItems = [
@@ -43,9 +50,17 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
       
       {/* SIDEBAR DESKTOP */}
       <aside className="hidden md:flex flex-col w-72 border-r border-slate-800 bg-[#0F172A] px-4 py-6 z-10">
-        <div className="mb-10 px-4 text-2xl font-baloo font-bold text-primary tracking-wider">
-          AGORA-VOXA
-        </div>
+      <div className="flex items-center gap-3 mb-8 px-2">
+  {/* Remplace "logo.png" par le vrai nom de ton image placée dans le dossier /public */}
+  <Image 
+    src="/logo-agoravoxa.webp" 
+    alt="Logo Agora-Voxa" 
+    width={40} 
+    height={40} 
+    className="object-contain rounded-xl"
+  />
+  <h1 className="font-baloo text-xl font-bold text-white">AGORA-VOXA</h1>
+</div>
         
         <nav className="flex-1 space-y-2">
           {navItems.map((item) => {
@@ -134,7 +149,6 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
                
             {/* 🌟 TOP BAR : NOTIFICATIONS + PROFIL 🌟 */}
             <div className="flex justify-end mb-6 md:mb-8 items-center gap-4">
-                {/* Pastille Profil */}
               <Link 
                 href="/dashboard/compte" 
                 className="inline-flex items-center gap-3 bg-[#1E293B] border border-slate-700/50 pl-4 pr-1.5 py-1.5 rounded-full hover:bg-slate-800 transition-all cursor-pointer group shadow-sm"
@@ -147,7 +161,7 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
                   {user?.avatar || "🦉"}
                 </div>
               </Link>
-              {/* 💡 Cloche de notification (Mise à jour avec le onClick) */}
+
               <button 
                 onClick={() => setIsNotifPanelOpen(true)}
                 className="relative p-2 text-slate-400 hover:text-white transition-colors group"
@@ -158,8 +172,6 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-600"></span>
                 </span>
               </button>
-
-         
             </div>
 
             {children}
@@ -211,19 +223,16 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
         </Link>
       </nav>
 
-      {/* 💡 PANNEAU DE NOTIFICATIONS (SLIDE-OVER) */}
+      {/* PANNEAU DE NOTIFICATIONS */}
       {isNotifPanelOpen && (
         <div className="fixed inset-0 z-[100] flex justify-end">
-          {/* Arrière-plan flou (cliquer dessus ferme le panneau) */}
           <div 
             className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() => setIsNotifPanelOpen(false)}
           ></div>
           
-          {/* Panneau principal */}
           <div className="relative w-full max-w-sm h-full bg-[#1E293B] border-l border-slate-700 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             
-            {/* Header du panneau */}
             <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
               <h3 className="font-baloo text-2xl font-bold text-white flex items-center gap-2">
                 <Bell className="w-5 h-5 text-indigo-400" />
@@ -237,9 +246,7 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
-            {/* Contenu (Liste des notifications) */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              
               <Link 
               href="/dashboard/studio" 
               className="block bg-[#0F172A] border border-slate-700/50 rounded-2xl p-4 relative hover:bg-slate-800 transition-colors"
@@ -261,7 +268,6 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
                 </p>
                 <span className="text-xs text-slate-500 mt-3 block">Il y a 2 heures</span>
               </div>
-
             </div>
           </div>
         </div>
@@ -315,15 +321,13 @@ function AppNavigation({ children }: { children: React.ReactNode }) {
   );
 }
 
-// LE COMPOSANT PARENT (Tout en bas du fichier)
+// LE COMPOSANT PARENT
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AppNavigation>
         {children}
       </AppNavigation>
-      
-      {/* 👇 La bannière est maintenant uniquement dans la zone connectée ! */}
       <InstallPwaBanner />
     </>
   );

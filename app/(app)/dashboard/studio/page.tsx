@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image"; // Import pour gérer l'image proprement
+import Image from "next/image";
+import { useUser } from "@/context/UserContext"; // 👈 On importe le contexte
+import { Crown, Lock, Share2, Download } from "lucide-react"; // Quelques icônes utiles
 
 type StudioState = "SETUP" | "RECORDING" | "ANALYZING" | "RESULTS";
 
@@ -24,6 +26,10 @@ Je vous remercie.`;
 export default function StudioPage() {
   const router = useRouter();
   
+  // 💡 NOUVEAU : Récupération des infos Premium
+  const { isPremium, hasUsedStudioTrial, markStudioTrialUsed } = useUser();
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
+
   const [step, setStep] = useState<StudioState>("SETUP");
   const [recordTime, setRecordTime] = useState(0);
   const [mode, setMode] = useState<"VIDEO" | "AUDIO">("VIDEO");
@@ -37,6 +43,13 @@ export default function StudioPage() {
   const prompterRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false); 
   const [hasStartedRecording, setHasStartedRecording] = useState(false);
+
+  // 💡 NOUVEAU : Affichage du paywall au chargement
+  useEffect(() => {
+    if (!isPremium) {
+      setShowPaywallModal(true);
+    }
+  }, [isPremium]);
 
   useEffect(() => {
     return () => {
@@ -78,10 +91,16 @@ export default function StudioPage() {
         const blob = new Blob(recordedChunks, { type: "video/webm" });
         setVideoUrl(URL.createObjectURL(blob));
       }
-      const timer = setTimeout(() => setStep("RESULTS"), 4000);
+      const timer = setTimeout(() => {
+        setStep("RESULTS");
+        // 💡 NOUVEAU : On grille l'essai gratuit une fois les résultats affichés !
+        if (!isPremium && !hasUsedStudioTrial) {
+          markStudioTrialUsed();
+        }
+      }, 4000);
       return () => clearTimeout(timer);
     }
-  }, [step, recordedChunks]);
+  }, [step, recordedChunks, isPremium, hasUsedStudioTrial, markStudioTrialUsed]);
 
   const togglePlayPause = () => {
     if (!hasStartedRecording) {
@@ -152,9 +171,88 @@ export default function StudioPage() {
     return `${m}:${s}`;
   };
 
+  // 💡 NOUVEAU : Fonction de partage natif vers les réseaux
+  const handleShare = async () => {
+    if (!videoUrl || recordedChunks.length === 0) return;
+    
+    const blob = new Blob(recordedChunks, { type: "video/mp4" }); // MP4 est mieux supporté par les mobiles
+    const file = new File([blob], "discours-agora-voxa.mp4", { type: "video/mp4" });
+
+    // Si le navigateur mobile supporte le partage de fichiers
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Mon entraînement Agora-Voxa",
+          text: "Je m'entraîne à prendre la parole en public sur Agora-Voxa ! 🦉🎙️ #Eloquence #AgoraVoxa"
+        });
+      } catch (error) {
+        console.log("Partage annulé ou échoué", error);
+      }
+    } else {
+      // Fallback pour les ordinateurs : on télécharge la vidéo
+      const a = document.createElement("a");
+      a.href = videoUrl;
+      a.download = "discours-agora-voxa.mp4";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      alert("La vidéo a été téléchargée ! Vous pouvez maintenant la poster sur vos réseaux favoris.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-soleil">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-soleil relative">
       
+      {/* 💡 NOUVEAU : LE PAYWALL MODAL */}
+      {showPaywallModal && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-4">
+          <div className="bg-[#1E293B] border border-[#662483]/50 p-8 rounded-3xl max-w-md w-full text-center shadow-[0_0_50px_rgba(102,36,131,0.2)] animate-in zoom-in-95">
+            <div className="w-20 h-20 bg-[#2d1b38] rounded-full mx-auto flex items-center justify-center mb-6 border-2 border-[#662483]">
+              <Crown className="w-10 h-10 text-[#d08df5]" />
+            </div>
+            
+            {hasUsedStudioTrial ? (
+              <>
+                <h2 className="text-3xl font-baloo font-bold text-white mb-2">Essai terminé !</h2>
+                <p className="text-slate-300 mb-8 leading-relaxed">
+                  Vous avez utilisé votre essai gratuit du Studio Oratoire. Passez Premium pour débloquer l'accès illimité, de nouveaux textes et des retours IA poussés.
+                </p>
+                <div className="space-y-4">
+                  <Link href="/tarifs" className="block w-full bg-gradient-to-r from-[#662483] to-[#8631ab] text-white py-4 rounded-xl font-baloo font-bold text-lg hover:shadow-lg hover:shadow-[#662483]/50 transition-all hover:-translate-y-0.5">
+                    Débloquer le Studio Illimité
+                  </Link>
+                  <button onClick={() => router.push("/dashboard/arene")} className="block w-full text-slate-400 hover:text-white font-bold py-2">
+                    Retour à l'Arène
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-3xl font-baloo font-bold text-white mb-2">Studio Oratoire</h2>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Bienvenue dans l'outil Premium d'Agora-Voxa. Enregistrez-vous, et l'IA analysera votre voix et votre posture.
+                </p>
+                <div className="bg-slate-900/50 rounded-xl p-4 mb-8 border border-slate-700/50">
+                  <p className="font-bold text-[#d08df5]">🎁 Vous avez 1 essai gratuit.</p>
+                </div>
+                <div className="space-y-4">
+                  <button onClick={() => setShowPaywallModal(false)} className="w-full bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-xl font-baloo font-bold text-lg transition-all">
+                    Utiliser mon essai gratuit
+                  </button>
+                  <Link href="/tarifs" className="flex items-center justify-center gap-2 w-full text-[#d08df5] hover:text-white font-bold py-2 transition-colors">
+                    <Crown className="w-4 h-4" /> Voir les offres Premium
+                  </Link>
+                  <button onClick={() => router.push("/dashboard")} className="block w-full text-slate-500 hover:text-slate-300 text-sm py-2">
+                    Plus tard
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       <header className="p-4 md:p-6 flex items-center justify-between border-b border-slate-800 z-50 bg-slate-900">
         <button 
           onClick={() => {
@@ -166,7 +264,11 @@ export default function StudioPage() {
           ← Quitter
         </button>
         <div className="flex items-center gap-2">
-          <span className="bg-[#662483] text-white px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">PRO</span>
+          {isPremium ? (
+            <span className="bg-[#662483] text-white px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-1"><Crown className="w-3 h-3"/> PRO</span>
+          ) : (
+            <span className="bg-slate-700 text-slate-300 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">ESSAI</span>
+          )}
         </div>
       </header>
 
@@ -179,7 +281,11 @@ export default function StudioPage() {
               <p className="text-slate-400 text-lg">Athéna analysera votre regard, votre voix et vos tics de langage.</p>
             </div>
 
-            <div className="bg-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl">
+            <div className="bg-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden">
+              {!isPremium && (
+                 <div className="absolute top-0 right-0 bg-[#662483] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl z-10">ESSAI UNIQUE</div>
+              )}
+              
               <h2 className="text-xl font-baloo font-bold text-white mb-4">📜 Défi : Le pouvoir des mots (<span className="text-[#662483]">~50 sec</span>)</h2>
               <p className="text-slate-400 italic mb-8">Un discours vibrant sur l'importance de la voix humaine.</p>
               
@@ -263,7 +369,6 @@ export default function StudioPage() {
 
         {step === "ANALYZING" && (
           <div className="text-center space-y-8 animate-in fade-in">
-            {/* 💡 REMPLACEMENT ÉMOJI PAR TA MASCOTTE */}
             <div className="relative w-32 h-32 mx-auto animate-bounce">
               <Image 
                 src="/mascotte-athena-reflexion.webp" 
@@ -280,7 +385,6 @@ export default function StudioPage() {
         {step === "RESULTS" && (
           <div className="w-full max-w-5xl p-6 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex flex-col items-center text-center gap-4">
-               {/* 💡 PETITE PANTHÈRE À CÔTÉ DU SCORE */}
               <div className="w-16 h-16 relative">
                 <Image src="/mascotte-athena-applause.webp" alt="Panthère" fill className="object-contain" />
               </div>
@@ -297,13 +401,36 @@ export default function StudioPage() {
                   {videoUrl && <video src={videoUrl} controls className="w-full h-full object-cover" />}
                 </div>
 
+                {/* 💡 NOUVEAU : Les boutons de partage utilisent la fonction native */}
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <a href="#" className="bg-black border border-slate-700 hover:border-[#00f2fe] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">TikTok</a>
-                  <a href="#" className="bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90">Instagram</a>
+                  <button 
+                    onClick={handleShare} 
+                    className="bg-black border border-slate-700 hover:border-[#00f2fe] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Share2 className="w-5 h-5" /> TikTok
+                  </button>
+                  <button 
+                    onClick={handleShare} 
+                    className="bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90"
+                  >
+                    <Share2 className="w-5 h-5" /> Instagram
+                  </button>
                 </div>
+                {/* Petit bouton fallback visible pour télécharger manuellement si on veut */}
+                <button 
+                    onClick={handleShare} 
+                    className="w-full text-xs text-slate-500 hover:text-slate-300 flex items-center justify-center gap-1 mt-2"
+                  >
+                    <Download className="w-3 h-3" /> Télécharger la vidéo
+                </button>
               </div>
 
-              <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-xl flex flex-col justify-center">
+              <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-xl flex flex-col justify-center relative overflow-hidden">
+                {!isPremium && (
+                  <div className="absolute top-0 right-0 bg-[#662483] text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl z-10 flex items-center gap-1">
+                    <Lock className="w-3 h-3" /> APERÇU
+                  </div>
+                )}
                 <h3 className="font-bold text-slate-400 uppercase tracking-widest text-sm mb-6">Analyse détaillée</h3>
                 <ul className="space-y-6">
                   <li className="flex gap-4 items-start">
@@ -320,26 +447,38 @@ export default function StudioPage() {
                       <p className="text-slate-400 leading-relaxed font-soleil">Attention : 2 petits "euh" détectés. Respirez au lieu de combler le vide.</p>
                     </div>
                   </li>
-                  <li className="flex gap-4 items-start">
+                  <li className="flex gap-4 items-start relative">
                     <div className="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center text-2xl shrink-0">👁️</div>
-                    <div>
+                    <div className={!isPremium ? "blur-sm select-none" : ""}>
                       <strong className="text-white text-lg block mb-1">Posture & Regard</strong>
                       <p className="text-slate-400 leading-relaxed font-soleil">Bon maintien. Veillez à regarder plus souvent l'objectif.</p>
                     </div>
+                    {!isPremium && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                         <span className="bg-[#662483] text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">Premium uniquement</span>
+                      </div>
+                    )}
                   </li>
                 </ul>
               </div>
             </div>
             
-            <button 
-              onClick={() => {
-                if (stream) stream.getTracks().forEach(track => track.stop());
-                router.push("/dashboard");
-              }} 
-              className="mt-8 w-full bg-slate-800 text-white px-8 py-4 rounded-xl font-baloo font-bold hover:bg-slate-700 transition-colors text-lg"
-            >
-               Terminer la session et retourner à l'Agora
-            </button>
+            <div className="pt-8 space-y-4">
+              {!isPremium && (
+                 <Link href="/tarifs" className="block w-full text-center bg-gradient-to-r from-[#662483] to-[#8631ab] text-white px-8 py-4 rounded-xl font-baloo font-bold hover:shadow-lg hover:shadow-[#662483]/50 transition-all text-lg hover:-translate-y-0.5">
+                   S'abonner pour débloquer l'accès illimité
+                 </Link>
+              )}
+              <button 
+                onClick={() => {
+                  if (stream) stream.getTracks().forEach(track => track.stop());
+                  router.push("/dashboard");
+                }} 
+                className="w-full bg-slate-800 text-white px-8 py-4 rounded-xl font-baloo font-bold hover:bg-slate-700 transition-colors text-lg"
+              >
+                 Terminer la session et retourner à l'Agora
+              </button>
+            </div>
           </div>
         )}
 

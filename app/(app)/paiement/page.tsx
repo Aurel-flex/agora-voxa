@@ -1,34 +1,20 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, ShieldCheck, CreditCard, Loader2, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Sparkles, Hammer } from "lucide-react";
 
 export default function PaiementPage() {
   const router = useRouter();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const handlePayment = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-
-    // Simulation d'un appel à l'API de paiement (ex: Stripe)
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsSuccess(true);
-      
-      // Redirection vers le dashboard après le succès
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 2000);
-    }, 2500); // Faux chargement de 2.5 secondes
-  };
 
   return (
-    <div className="min-h-screen bg-[#0B1120] text-slate-200 flex flex-col items-center justify-center p-4 py-10 font-soleil">
+    <div className="min-h-screen bg-[#0B1120] text-slate-200 flex flex-col items-center justify-center p-4 py-10 font-soleil relative overflow-hidden">
       
-      <div className="w-full max-w-4xl">
+      {/* Éclairage d'ambiance */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#662483]/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div className="w-full max-w-4xl relative z-10">
         {/* En-tête du checkout */}
         <button 
           onClick={() => router.back()}
@@ -40,10 +26,10 @@ export default function PaiementPage() {
 
         <div className="bg-[#1E293B] border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
           
-          {/* COLONNE GAUCHE : Récapitulatif de commande */}
+          {/* COLONNE GAUCHE : Récapitulatif de commande (inchangée) */}
           <div className="w-full md:w-5/12 bg-[#0F172A] p-8 md:p-10 border-b md:border-b-0 md:border-r border-slate-700/50 flex flex-col justify-between">
             <div>
-              <div className="font-baloo text-2xl font-bold text-primary tracking-wider mb-8 flex items-center gap-2">
+              <div className="font-baloo text-2xl font-bold text-[#d08df5] tracking-wider mb-8 flex items-center gap-2">
                 AGORA-VOXA
               </div>
               
@@ -75,106 +61,52 @@ export default function PaiementPage() {
             </div>
           </div>
 
-          {/* COLONNE DROITE : Formulaire de paiement */}
-          <div className="w-full md:w-7/12 p-8 md:p-10 relative">
+          {/* COLONNE DROITE : Le "Fake Door" (Bientôt disponible) */}
+          <div className="w-full md:w-7/12 p-8 md:p-10 flex flex-col items-center justify-center text-center">
             
-            {/* Overlay de succès */}
-            {isSuccess && (
-              <div className="absolute inset-0 bg-[#1E293B] z-10 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-300">
-                <CheckCircle2 className="w-24 h-24 text-emerald-400 mb-6 animate-bounce" />
-                <h3 className="font-baloo text-3xl font-bold text-white mb-2">Paiement validé !</h3>
-                <p className="text-slate-400 text-center px-6">
-                  Bienvenue dans l'élite de l'Agora. La Panthère vous attend dans le Studio.
-                </p>
-              </div>
-            )}
+            {/* Badge "Bientôt disponible" */}
+            <div className="inline-flex items-center gap-2 bg-[#662483]/20 text-[#d08df5] px-4 py-2 rounded-full text-sm font-baloo font-bold uppercase tracking-widest border border-[#662483]/30 mb-6 shadow-inner shadow-[#662483]/20">
+              <Sparkles className="w-4 h-4" /> Bientôt disponible
+            </div>
 
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="font-baloo text-2xl font-bold text-white flex items-center gap-2">
-                Paiement sécurisé
-              </h3>
-              <div className="flex gap-2 opacity-60">
-                <div className="w-10 h-6 bg-slate-100 rounded flex items-center justify-center"><span className="text-blue-600 font-bold text-xs italic">VISA</span></div>
-                <div className="w-10 h-6 bg-slate-100 rounded flex items-center justify-center"><span className="text-red-500 font-bold text-xs">MC</span></div>
+            {/* Mascotte Athéna */}
+            <div className="relative w-32 h-32 mx-auto mb-6">
+              <Image 
+                src="/mascotte-athena-reflexion.webp" 
+                alt="Athéna prépare le Premium" 
+                fill 
+                className="object-contain drop-shadow-2xl animate-pulse"
+              />
+            </div>
+
+            <h3 className="font-baloo text-3xl font-bold text-white mb-4">
+              La forge est en cours...
+            </h3>
+            
+            <p className="font-soleil text-slate-300 text-base mb-8 leading-relaxed">
+              Athéna travaille d'arrache-pied pour finaliser l'expérience <strong className="text-[#d08df5] font-bold">Premium</strong>. L'analyse IA de ta voix sera ouverte très prochainement !
+            </p>
+
+            {/* Bloc d'avertissement */}
+            <div className="w-full bg-[#0F172A] p-4 rounded-2xl border border-slate-800 mb-8 flex items-start gap-4 text-left shadow-inner">
+              <div className="w-10 h-10 bg-[#662483]/20 rounded-full flex items-center justify-center shrink-0 border border-[#662483]/30">
+                <Hammer className="w-5 h-5 text-[#d08df5]" />
+              </div>
+              <div>
+                <h4 className="font-baloo font-bold text-white text-md">Paiements suspendus</h4>
+                <p className="font-soleil text-xs text-slate-400 mt-1 leading-relaxed">
+                  Garde tes XP au chaud en attendant l'ouverture officielle. La carte bancaire n'est pas encore requise.
+                </p>
               </div>
             </div>
 
-            <form onSubmit={handlePayment} className="space-y-6">
-              
-              {/* Nom sur la carte */}
-              <div>
-                <label className="block text-sm font-medium text-slate-400 mb-2">Nom sur la carte</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Jean Dupont"
-                  className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#662483] transition-colors"
-                />
-              </div>
-
-              {/* Numéro de carte */}
-              <div>
-                <label className="block text-sm font-medium text-slate-400 mb-2">Numéro de carte</label>
-                <div className="relative">
-                  <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input 
-                    type="text" 
-                    required
-                    maxLength={19}
-                    placeholder="0000 0000 0000 0000"
-                    className="w-full bg-[#0F172A] border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:border-[#662483] transition-colors font-mono tracking-widest"
-                  />
-                </div>
-              </div>
-
-              {/* Expiration & CVC */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Expiration</label>
-                  <input 
-                    type="text" 
-                    required
-                    maxLength={5}
-                    placeholder="MM/AA"
-                    className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#662483] transition-colors font-mono text-center"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">CVC</label>
-                  <input 
-                    type="text" 
-                    required
-                    maxLength={3}
-                    placeholder="123"
-                    className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#662483] transition-colors font-mono text-center"
-                  />
-                </div>
-              </div>
-
-              {/* Bouton de paiement */}
-              <button 
-                type="submit"
-                disabled={isProcessing}
-                className="w-full mt-6 bg-accent hover:bg-[#4d1b63] disabled:bg-slate-700 text-white py-4 rounded-xl font-baloo font-bold text-lg transition-all shadow-lg shadow-[#662483]/20 flex items-center justify-center gap-2"
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                    Traitement en cours...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-5 h-5" />
-                    Payer 4,99 €
-                  </>
-                )}
-              </button>
-
-              <div className="flex justify-center items-center gap-2 mt-4 text-xs text-slate-500">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                Vos données sont chiffrées de bout en bout.
-              </div>
-            </form>
+            {/* Call to Action de sortie */}
+            <Link 
+              href="/dashboard"
+              className="w-full flex items-center justify-center gap-3 bg-slate-800 hover:bg-slate-700 text-white py-4 rounded-xl font-baloo font-bold text-lg transition-all shadow-lg border border-slate-700 hover:border-slate-600"
+            >
+               Retourner à l'Agora
+            </Link>
 
           </div>
         </div>

@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import type { Metadata } from 'next';
 
+// 💡 Cette instruction interdit formellement l'indexation de cette page
+export const metadata: Metadata = {
+  title: 'Mentions Légales',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 const faqs = [
   {
     question: "Comment fonctionne l'analyse par l'IA ?",

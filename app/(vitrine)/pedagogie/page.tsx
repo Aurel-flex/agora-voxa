@@ -21,7 +21,7 @@ export default function PedagogiePage() {
               Nos experts décomposent les figures de style, de l'anaphore au syllogisme. Regardez des analyses de discours célèbres pour comprendre comment la théorie s'applique dans la réalité.
             </p>
             <ul className="space-y-3 text-slate-700 font-medium">
-              <li className="flex items-center gap-2">✅ Format court (3 à 5 minutes)</li>
+              <li className="flex items-center gap-2">✅ Format court (1 à 5 minutes)</li>
               <li className="flex items-center gap-2">✅ Exemples historiques concrets</li>
               <li className="flex items-center gap-2">✅ Transcriptions incluses</li>
             </ul>

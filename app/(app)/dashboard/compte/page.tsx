@@ -1,17 +1,51 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
-import { User, Lock, Star, BellRing, ShieldCheck, LogOut } from "lucide-react";
+import { User, Lock, Star, BellRing, ShieldCheck, LogOut, CheckCircle2, AlertCircle } from "lucide-react";
 import PushNotification from "@/components/PushNotification"; 
 
 export default function ComptePage() {
   const { xp, completedCourses, user, level, league, updateProfile, logout } = useUser();
+
+  // 💡 NOUVEAU : États pour gérer le formulaire
+  const [name, setName] = useState(user?.name || "");
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  // Synchronise le nom au cas où l'utilisateur met une fraction de seconde à charger
+  useEffect(() => {
+    if (user?.name) {
+      setName(user.name);
+    }
+  }, [user?.name]);
 
   const XP_PER_LEVEL = 500;
   const currentLevel = level || Math.floor(xp / XP_PER_LEVEL) + 1;
   const currentLevelXp = xp % XP_PER_LEVEL;
   const progressPercentage = Math.round((currentLevelXp / XP_PER_LEVEL) * 100);
   const AVATARS = ["👤", "🦉", "🦁", "👑", "🏛️", "⚡"];
+
+  // 💡 NOUVEAU : Fonction de sauvegarde du pseudo
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setMessage({ type: "", text: "" });
+
+    try {
+      // On sauvegarde le nouveau nom, et on garde l'avatar actuel
+      await updateProfile(name, user?.avatar || "🦉");
+      setMessage({ type: "success", text: "Profil mis à jour avec succès !" });
+      
+      // On efface le message après 3 secondes pour un effet plus propre
+      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+    } catch (error) {
+      console.error(error);
+      setMessage({ type: "error", text: "Oups, impossible de sauvegarder." });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 animate-fade-in pb-10">
@@ -34,7 +68,8 @@ export default function ComptePage() {
               {AVATARS.map(av => (
                 <button 
                   key={av}
-                  onClick={() => updateProfile(user?.name || "", av)}
+                  // 💡 Utilise le 'name' local pour ne pas écraser une modif en cours
+                  onClick={() => updateProfile(name, av)} 
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-xl hover:bg-slate-800 transition-colors ${user?.avatar === av ? 'bg-indigo-500/20 border border-indigo-500' : 'border border-transparent'}`}
                 >
                   {av}
@@ -77,13 +112,51 @@ export default function ComptePage() {
               <User className="w-6 h-6 text-indigo-400" />
               Informations personnelles
             </h3>
-            <div className="space-y-5">
-              <input type="text" defaultValue={user?.name || ""} placeholder="Pseudo" className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
-              <input type="email" defaultValue={user?.email || ""} placeholder="Email" className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
-              <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-baloo font-bold transition-colors">
-                Sauvegarder
+            
+            {/* 💡 NOUVEAU : Le formulaire interactif */}
+            <form onSubmit={handleSaveProfile} className="space-y-5">
+              
+              <div className="space-y-1">
+                <label className="text-xs font-baloo text-slate-400 ml-1">Ton Pseudo</label>
+                <input 
+                  type="text" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Pseudo" 
+                  required
+                  className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all" 
+                />
+              </div>
+
+              <div className="space-y-1 relative">
+                <label className="text-xs font-baloo text-slate-400 ml-1 flex justify-between">
+                  <span>Adresse Email</span>
+                  <span className="text-slate-500 flex items-center gap-1"><Lock className="w-3 h-3" /> Non modifiable</span>
+                </label>
+                <input 
+                  type="email" 
+                  value={user?.email || ""} 
+                  disabled // 👈 Email grisé et bloqué
+                  className="w-full bg-[#0F172A]/50 border border-slate-800 rounded-xl px-4 py-3 text-slate-400 cursor-not-allowed" 
+                />
+              </div>
+
+              {/* Message de succès ou d'erreur */}
+              {message.text && (
+                <div className={`flex items-center gap-2 text-sm font-bold p-3 rounded-xl border ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                  {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                  {message.text}
+                </div>
+              )}
+
+              <button 
+                type="submit" 
+                disabled={isSaving || name.trim() === ""}
+                className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-400 text-white px-8 py-3 rounded-xl font-baloo font-bold transition-colors w-full md:w-auto mt-2"
+              >
+                {isSaving ? "Sauvegarde..." : "Sauvegarder les modifications"}
               </button>
-            </div>
+            </form>
           </div>
 
           {/* PRÉFÉRENCES & PUSH */}

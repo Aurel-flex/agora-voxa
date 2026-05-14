@@ -1,3 +1,14 @@
+import type { Metadata } from 'next';
+
+// 💡 Cette instruction interdit formellement l'indexation de cette page
+export const metadata: Metadata = {
+  title: 'Mentions Légales',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default function CGVPage() {
   return (
     <div className="min-h-screen bg-slate-50 py-20 px-4 font-soleil text-slate-700">

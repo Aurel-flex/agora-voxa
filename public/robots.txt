@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# On bloque l'accès à l'application privée
+Disallow: /dashboard/
+Disallow: /paiement/
+
+# On bloque les pages administratives et légales
+Disallow: /mentions-legales
+Disallow: /confidentialite
+Disallow: /cgv
+
+Sitemap: https://ton-domaine.fr/sitemap.xml
